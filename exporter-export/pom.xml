@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>gov.va.oia.terminology.converters</groupId>
+		<artifactId>exporter</artifactId>
+		<version>1.0</version>
+	</parent>
+
+	<artifactId>exporter-export</artifactId>
+	<packaging>pom</packaging>
+	<name>exporter-export</name>
+	<!-- this should be set to ${sourceData.artifactId}-${sourceData.version}-exporter-${project.parent.version} but that doesn't appease the maven gods that know best.... -->
+	<!--version>vhat-econcept-2013.02.11-loader-2.4-exporter-1.0</version-->
+	<version>sct-econcept-2013.07.31-build-3-exporter-1.0</version>
+	<!--version>RxNorm-econcept-2013.05.06-loader-1.1-exporter-1.0</version-->
+	<!--version>ndfrtDTSExtract-econcept-2013.02.04.12AB-loader-2.4-exporter-1.0</version-->
+
+	<properties>
+		<!-- VHAT  -->
+		<!--sourceData.groupId>gov.va.oia.terminology.converters</sourceData.groupId>
+		<sourceData.artifactId>vhat-econcept</sourceData.artifactId>
+		<sourceData.version>2013.02.11-loader-2.4</sourceData.version>
+		<sourceData.classifier></sourceData.classifier-->
+		
+		<!-- SCT -->
+		<sourceData.groupId>org.ihtsdo.sct.baseline</sourceData.groupId>
+		<sourceData.artifactId>sct-econcept</sourceData.artifactId>
+		<sourceData.version>2013.07.31-build-3</sourceData.version>
+		<sourceData.classifier>latest</sourceData.classifier>
+		
+		<!-- RxNorm -->
+		<!--sourceData.groupId>gov.va.oia.terminology.converters</sourceData.groupId>
+		<sourceData.artifactId>RxNorm-econcept</sourceData.artifactId>
+		<sourceData.version>2013.05.06-loader-1.1</sourceData.version>
+		<sourceData.classifier></sourceData.classifier-->
+		
+		<!-- RxNorm -->
+		<!--sourceData.groupId>gov.va.oia.terminology.converters</sourceData.groupId>
+		<sourceData.artifactId>ndfrtDTSExtract-econcept</sourceData.artifactId>
+		<sourceData.version>2013.02.04.12AB-loader-2.4</sourceData.version>
+		<sourceData.classifier></sourceData.classifier-->
+		
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-data</id>
+						<configuration>
+							<descriptors>
+								<descriptor>src/main/assembly/generated-artifact.xml</descriptor>
+							</descriptors>
+						</configuration>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Get source terminology file from archiva -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>extract-data</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>${sourceData.groupId}</groupId>
+									<artifactId>${sourceData.artifactId}</artifactId>
+									<version>${sourceData.version}</version>
+									<classifier>${sourceData.classifier}</classifier>
+									<type>zip</type>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.build.directory}/generated-resources/data</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>exporter-mojo</artifactId>
+				<version>${project.parent.version}</version>
+				<executions>
+					<execution>
+						<id>export terminology</id>
+						<configuration>
+							<!-- Use this to process a local file (optionally, comment out the fetch data section above as well) -->
+							<!--inputFile>/mnt/d/Work/Apelon/Workspaces/Loaders/chdr/chdr-econcept/CHDR Data/</inputFile--> 
+							
+							<!-- Use this to process the jbin file(s) that comes out of the extract-data section(s) above. -->
+							<inputFile>${project.build.directory}/generated-resources/data</inputFile>
+						</configuration>
+						<goals>
+							<goal>export-terminology</goal>
+						</goals>
+						<phase>generate-resources</phase>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
