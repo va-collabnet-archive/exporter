@@ -1,6 +1,7 @@
 package gov.va.med.term.exporter;
 
 import gov.va.oia.terminology.converters.sharedUtils.ConsoleUtil;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
@@ -8,37 +9,35 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
+
 import au.com.bytecode.opencsv.CSVWriter;
 
 /**
  * Goal which converts jbin data from the workbench into TSV format
- * 
- * @goal export-terminology
- * 
- * @phase process-sources
  */
+@Mojo( name = "export-terminology", defaultPhase = LifecyclePhase.PROCESS_SOURCES )
 public class ExporterMojo extends AbstractMojo
 {
 	/**
 	 * Where to put the output file.
-	 * 
-	 * @parameter expression="${project.build.directory}"
-	 * @required
 	 */
+	@Parameter( required = true, defaultValue = "${project.build.directory}" )
 	private File outputDirectory;
 
 	/**
 	 * Location of jbin data file. Expected to be a directory.
-	 * 
-	 * @parameter
-	 * @required
 	 */
+	@Parameter (required = true)
 	private File inputFile;
 
 	@Override
